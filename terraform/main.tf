@@ -1,6 +1,7 @@
+# main.tf
+
 terraform {
   required_version = ">= 1.5.0"
-
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -20,7 +21,6 @@ terraform {
 #####################
 # Providers
 #####################
-
 provider "aws" {
   region = var.region
 }
@@ -28,7 +28,6 @@ provider "aws" {
 #####################
 # Variables & Locals
 #####################
-
 variable "region" {
   description = "AWS region"
   type        = string
@@ -48,7 +47,6 @@ locals {
 #####################
 # Networking (VPC)
 #####################
-
 data "aws_availability_zones" "available" {}
 
 module "vpc" {
@@ -69,7 +67,6 @@ module "vpc" {
 #####################
 # EKS Cluster
 #####################
-
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.0"
@@ -79,6 +76,10 @@ module "eks" {
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
+
+  # Enable public access for development/testing
+  cluster_endpoint_public_access  = true
+  cluster_endpoint_private_access = true
 
   eks_managed_node_groups = {
     default = {
@@ -96,14 +97,11 @@ module "eks" {
 # Kubernetes & Helm providers
 # (use module.eks outputs; NO data aws_eks_cluster)
 #####################
-
 provider "kubernetes" {
   host = module.eks.cluster_endpoint
-
   cluster_ca_certificate = base64decode(
     module.eks.cluster_certificate_authority_data
   )
-
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws"
@@ -111,7 +109,9 @@ provider "kubernetes" {
       "eks",
       "get-token",
       "--cluster-name",
-      module.eks.cluster_name
+      module.eks.cluster_name,
+      "--region",
+      var.region
     ]
   }
 }
@@ -119,11 +119,9 @@ provider "kubernetes" {
 provider "helm" {
   kubernetes {
     host = module.eks.cluster_endpoint
-
     cluster_ca_certificate = base64decode(
       module.eks.cluster_certificate_authority_data
     )
-
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws"
@@ -131,7 +129,9 @@ provider "helm" {
         "eks",
         "get-token",
         "--cluster-name",
-        module.eks.cluster_name
+        module.eks.cluster_name,
+        "--region",
+        var.region
       ]
     }
   }
@@ -140,41 +140,17 @@ provider "helm" {
 #####################
 # NGINX Ingress via Helm
 #####################
-
 resource "helm_release" "nginx_ingress" {
   name       = "ingress-nginx"
   namespace  = "ingress-nginx"
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
-  version    = "4.11.2"
+  version    = "4.10.0"
 
   create_namespace = true
 
-  values = [
-    yamlencode({
-      controller = {
-        service = {
-          type = "LoadBalancer"
-          annotations = {
-            "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
-          }
-        }
-      }
-    })
-  ]
-
-  depends_on = [module.eks]
-}
-
-#####################
-# NGINX Service data (for output)
-#####################
-
-data "kubernetes_service" "nginx_lb" {
-  metadata {
-    name      = "ingress-nginx-controller"
-    namespace = "ingress-nginx"
+  set {
+    name  = "controller.service.type"
+    value = "LoadBalancer"
   }
-
-  depends_on = [helm_release.nginx_ingress]
 }

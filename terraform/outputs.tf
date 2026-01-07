@@ -6,11 +6,22 @@ output "cluster_name" {
 }
 
 output "cluster_endpoint" {
-  description = "EKS API server endpoint"
+  description = "EKS cluster endpoint"
   value       = module.eks.cluster_endpoint
 }
 
-output "nginx_ingress_service_hostname" {
-  description = "Hostname of the NGINX ingress Network Load Balancer"
-  value       = data.kubernetes_service.nginx_lb.status[0].load_balancer[0].ingress[0].hostname
+output "cluster_certificate_authority_data" {
+  description = "EKS cluster certificate authority data"
+  value       = module.eks.cluster_certificate_authority_data
+  sensitive   = true
+}
+
+output "region" {
+  description = "AWS region"
+  value       = var.region
+}
+
+output "vpc_id" {
+  description = "VPC ID"
+  value       = module.vpc.vpc_id
 }
