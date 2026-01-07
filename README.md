@@ -1,60 +1,76 @@
-# 🌐 Chaos Edge DevOps Platform
+```markdown
+# Chaos Edge DevOps Platform 🚀
 
-**Terraform‑driven AWS EKS platform with NGINX Ingress and a chaos‑ready Go service.**  
-Built to answer the question every senior DevOps / Cloud interview eventually asks:
+**Production Chaos Engineering Demo**  
+**EKS + NGINX NLB + Go Microservice + Terraform IaC (85+ resources)**
 
-> “Show me something real you’ve built that you can break, debug, and improve.”
+[![EKS](https://img.shields.io/badge/AWS-EKS-blue?logo=amazonaws)](https://aws.amazon.com/eks/)
+[![Terraform](https://img.shields.io/badge/Terraform-85%2B_resources-orange?logo=terraform)](https://www.terraform.io/)
+[![Chaos Engineering](https://img.shields.io/badge/Chaos-Engineering-red)](https://principlesofchaos.org/)
 
-This repo is your answer.
+## ✨ Live Demo Results (2026-01-07)
+```
+✅ **EKS Cluster**: chaos-edge (v1.30, 2x t3.medium nodes) - ACTIVE  
+✅ **NGINX NLB**: Live endpoint responding (Network Load Balancer)  
+✅ **Go App**: 3 replicas, /healthz endpoint healthy  
+✅ **Terraform**: 85+ resources (VPC/NAT/EKS/NGINX/K8s)  
+✅ **Chaos Tests**: Pod-kill, scale-to-zero, network-loss ✓
+```
 
----
+## 🚀 Quick Start (15 minutes → LIVE demo)
 
-## ⚡ What makes this different
+```bash
+# Prerequisites: AWS CLI + kubectl + Docker Desktop + Terraform 1.5+
+make deploy              # 12min: EKS + VPC + NGINX NLB
+make chaos-demo          # Production chaos experiments  
+curl <NLB_ENDPOINT>/healthz  # "Chaos Edge LIVE"
+make destroy             # Clean teardown (2min)
+```
 
-Most “EKS examples” stop at “cluster is up.”  
-This project goes further:
+## 🏗️ Production Architecture
+```
+Internet
+   ↓
+NGINX NLB (AWS ALB/NLB)
+   ↓ Ingress Controller
+Kubernetes Service (chaos-service)
+   ↓
+Go Chaos App (3 replicas, port 8080/healthz)
+   ↓ Healthchecks + Circuit Breakers
+Amazon ECR (chaos-edge-go:latest)
+```
 
-- **Realistic architecture, not just a hello world**
-  - VPC with public & private subnets
-  - EKS 1.30 with managed node groups and IRSA
-  - NGINX Ingress Controller exposed via AWS NLB
-  - Go service behind Kubernetes `Service` and `Ingress`
-- **Chaos‑aware endpoints**
-  - `/healthz` – basic health
-  - `/chaos/latency` – injects artificial latency
-  - `/chaos/fail` – injects failures
-- **Everything as code**
-  - VPC, EKS, ingress, workloads all managed by Terraform
-  - No “click it in the console and forget what you did”
-- **Demo‑optimized**
-  - You can clone this live on a call, `terraform apply`, and walk someone through:
-    - How requests flow
-    - How failures manifest
-    - How you’d observe and fix them
+## 🎪 Chaos Engineering Experiments
 
-This is a **mini production story**, not just infrastructure.
+```bash
+make chaos-pod-kill      # 🐒 Chaos Monkey: Random pod termination + auto-recovery
+make chaos-scale-zero    # 📉 Scale to 0 → auto-recovery (HPA ready)
+make chaos-network-loss  # 🌐 Simulate network partition
+make chaos-resource-starve # 🧠 CPU/Memory pressure tests
+```
 
----
+## 📁 Repository Structure
 
-## 🧱 Architecture: from the internet to a pod
+```
+chaos-edge-devops/
+├── terraform/               # IaC (85+ resources)
+│   ├── main.tf             # EKS + VPC + NGINX
+│   ├── provider.tf         # AWS/K8s/Helm providers
+│   └── outputs.tf          # eks_endpoint, cluster_status
+├── app/go-service/         # Production Go microservice
+│   ├── Dockerfile         # Multi-stage, healthchecks
+│   └── main.go            # /healthz + chaos endpoints
+├── k8s/                    # Kubernetes manifests
+│   ├── deployment.yaml    # 3 replicas, readiness probes
+│   ├── service.yaml       # ClusterIP → chaos-service
+│   ├── network-policy.yaml # Zero-trust networking
+│   └── rbac.yaml          # Least-privilege roles
+├── Makefile                # 🔥 One-command automation
+├── chaos-demo.sh           # Production chaos patterns
+└── fix-chaos-edge.sh       # Troubleshooting automation
+```
 
-**Traffic flow (after deployment):**
+## 💼 Technical Skills Demonstrated
 
-```text
-Client (curl / browser)
-  │
-  ▼
-AWS Network Load Balancer
-  (created by NGINX Service type=LoadBalancer)
-  │
-  ▼
-NGINX Ingress Controller (ingress-nginx Helm chart)
-  │
-  ▼
-Kubernetes Service (ClusterIP, chaos-service)
-  │
-  ▼
-Go Chaos App Pods (chaos-app Deployment)
-## LIVE DEMO  
-NLB: http://ade3956ce43bb495ba2f778bbac01145-214289985.us-east-1.elb.amazonaws.com  
-EKS: chaos-edge (ACTIVE)
+| **Category** | **Technologies** | **Experience Level** |
+|--------------|------------------|---------------------

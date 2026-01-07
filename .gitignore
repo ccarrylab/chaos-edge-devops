@@ -94,3 +94,15 @@ infracost-*.json
 
 # AWS
 .aws/
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+*.terraform.tfstate.backup
+.terragrunt-cache/
+.mutex
