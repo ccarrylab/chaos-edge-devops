@@ -1,0 +1,39 @@
+# ServiceAccount for chaos-go application
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: chaos-go-sa
+  namespace: default
+  labels:
+    app: chaos-go
+
+---
+# Role with minimal required permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: chaos-go-role
+  namespace: default
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+
+---
+# RoleBinding to connect ServiceAccount to Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: chaos-go-rolebinding
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: chaos-go-role
+subjects:
+- kind: ServiceAccount
+  name: chaos-go-sa
+  namespace: default
