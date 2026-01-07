@@ -1,0 +1,5 @@
+# AWS region where infrastructure will be deployed
+region = "us-east-1"
+
+# Name of the EKS cluster (must be unique within the AWS account)
+cluster_name = "chaos-edge"

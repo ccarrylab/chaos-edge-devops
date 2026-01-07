@@ -77,21 +77,8 @@ resource "helm_release" "nginx" {
   depends_on = [module.eks.eks_managed_node_groups]
 }
 
-data "aws_lb" "nginx_nlb" {
-  tags = {
-    "kubernetes.io/service-name" = "nginx-ingress/nginx-ingress-ingress-nginx-controller"
-  }
-
-  depends_on = [helm_release.nginx]
-}
-
-
 
 resource "aws_cloudfront_distribution" "chaos_edge" {
-  # Data source to locate the NGINX NLB created by Helm release
-  # Uses Kubernetes service tags to discover the load balancer dynamically
-
-
   origin {
     domain_name = data.aws_lb.nginx_nlb.dns_name
     origin_id   = "eks-nginx"
@@ -120,7 +107,7 @@ resource "aws_cloudfront_distribution" "chaos_edge" {
     forwarded_values {
       query_string = true
       headers      = ["Host", "Origin"]
-
+      
       cookies {
         forward = "all"
       }
