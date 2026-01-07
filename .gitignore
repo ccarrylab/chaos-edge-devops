@@ -3,3 +3,7 @@
 *.tfstate.backup
 terraform.tfvars
 .env
+# Add to .gitignore
+*.backup
+*.bak
+main.tf.backup*
