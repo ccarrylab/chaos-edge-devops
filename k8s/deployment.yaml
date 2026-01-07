@@ -1,20 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chaos-go
+  name: chaos-app
+  namespace: chaos
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
-      app: chaos-go
+      app: chaos-app
   template:
     metadata:
       labels:
-        app: chaos-go
+        app: chaos-app
     spec:
       containers:
-      - name: go-chaos
-        image: public.ecr.aws/ecs-chrome/edge-chaos:latest  # Replace w/ your ECR
+      - name: chaos-app
+        image: 089719647189.dkr.ecr.us-east-1.amazonaws.com/chaos-edge-go:latest
         ports:
         - containerPort: 8080
 ---
@@ -22,9 +23,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: chaos-service
+  namespace: chaos
 spec:
   selector:
-    app: chaos-go
+    app: chaos-app
   ports:
   - port: 80
     targetPort: 8080
