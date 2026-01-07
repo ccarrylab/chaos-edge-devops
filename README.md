@@ -1,50 +1,57 @@
 # 🌐 Chaos Edge DevOps Platform
 
-Production-grade edge computing platform with chaos engineering capabilities.
+**Terraform‑driven AWS EKS platform with NGINX Ingress and a chaos‑ready Go service.**  
+Built to answer the question every senior DevOps / Cloud interview eventually asks:
 
-**Architecture:** CloudFront → NLB → NGINX Ingress → EKS → Go Microservices
+> “Show me something real you’ve built that you can break, debug, and improve.”
 
-## 🎯 What This Does
+This repo is your answer.
 
-- **Edge Distribution:** CloudFront for global CDN with gzip compression
-- **Kubernetes Platform:** EKS 1.30 cluster with auto-scaling
-- **Ingress Control:** NGINX with NLB backend
-- **Chaos Engineering:** Built-in latency/failure injection endpoints
-- **Monitoring:** Dashboard for observability
+---
 
-## 📋 Prerequisites
+## ⚡ What makes this different
 
-- AWS CLI configured with appropriate credentials
-- Terraform >= 1.5
-- kubectl >= 1.28
-- Helm >= 3.12
-- shellcheck (for script validation)
+Most “EKS examples” stop at “cluster is up.”  
+This project goes further:
 
-## 🚀 Quick Start
+- **Realistic architecture, not just a hello world**
+  - VPC with public & private subnets
+  - EKS 1.30 with managed node groups and IRSA
+  - NGINX Ingress Controller exposed via AWS NLB
+  - Go service behind Kubernetes `Service` and `Ingress`
+- **Chaos‑aware endpoints**
+  - `/healthz` – basic health
+  - `/chaos/latency` – injects artificial latency
+  - `/chaos/fail` – injects failures
+- **Everything as code**
+  - VPC, EKS, ingress, workloads all managed by Terraform
+  - No “click it in the console and forget what you did”
+- **Demo‑optimized**
+  - You can clone this live on a call, `terraform apply`, and walk someone through:
+    - How requests flow
+    - How failures manifest
+    - How you’d observe and fix them
 
-### Using Make Targets (Recommended)
+This is a **mini production story**, not just infrastructure.
 
-```bash
-# Initialize Terraform
-make init
+---
 
-# Plan changes
-make plan
+## 🧱 Architecture: from the internet to a pod
 
-# Deploy infrastructure
-make apply
+**Traffic flow (after deployment):**
 
-# Configure kubectl
-make config
-
-# Deploy demo app
-make demo
-
-# Test the platform
-make test
-
-# Validate everything
-make validate
-
-# Get help
-make help
+```text
+Client (curl / browser)
+  │
+  ▼
+AWS Network Load Balancer
+  (created by NGINX Service type=LoadBalancer)
+  │
+  ▼
+NGINX Ingress Controller (ingress-nginx Helm chart)
+  │
+  ▼
+Kubernetes Service (ClusterIP, chaos-service)
+  │
+  ▼
+Go Chaos App Pods (chaos-app Deployment)
