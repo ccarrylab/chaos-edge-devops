@@ -1,3 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Run this from the repo root: chaos-edge-devops/
+
+cd terraform
+
+echo "🔧 Replacing main.tf, provider.tf, variables.tf, outputs.tf with fixed versions..."
+
+cat > main.tf <<'EOF'
 terraform {
   required_version = ">= 1.5.0"
 
@@ -107,7 +117,7 @@ provider "kubernetes" {
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws"
-    args = [
+    args        = [
       "eks",
       "get-token",
       "--cluster-name",
@@ -127,7 +137,7 @@ provider "helm" {
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws"
-      args = [
+      args        = [
         "eks",
         "get-token",
         "--cluster-name",
@@ -178,3 +188,55 @@ data "kubernetes_service" "nginx_lb" {
 
   depends_on = [helm_release.nginx_ingress]
 }
+EOF
+
+cat > provider.tf <<'EOF'
+# provider.tf
+# Core providers and required_providers are defined in main.tf.
+terraform {
+  required_version = ">= 1.5.0"
+}
+EOF
+
+cat > variables.tf <<'EOF'
+# variables.tf
+# Extra variables can go here.
+# region and cluster_name are defined in main.tf.
+
+variable "tags" {
+  description = "Common tags applied to all resources"
+  type        = map(string)
+  default     = {
+    Project = "chaos-edge-devops"
+    Owner   = "ccarrylab"
+  }
+}
+EOF
+
+cat > outputs.tf <<'EOF'
+# outputs.tf
+
+output "cluster_name" {
+  description = "EKS cluster name"
+  value       = module.eks.cluster_name
+}
+
+output "cluster_endpoint" {
+  description = "EKS API server endpoint"
+  value       = module.eks.cluster_endpoint
+}
+
+output "nginx_ingress_service_hostname" {
+  description = "Hostname of the NGINX ingress Network Load Balancer"
+  value       = data.kubernetes_service.nginx_lb.status[0].load_balancer[0].ingress[0].hostname
+}
+EOF
+
+echo "✅ Files written. Running terraform fmt/validate/plan..."
+
+terraform fmt
+terraform validate
+terraform plan
+
+echo "✅ Done. You can now run: terraform apply"
+

@@ -1,18 +1,12 @@
-variable "region" {
-  description = "AWS region"
-  type        = string
-  default     = "us-east-1"
-}
+# variables.tf
+# Extra variables can go here.
+# region and cluster_name are defined in main.tf.
 
-variable "cluster_name" {
-  description = "EKS cluster name"
-  type        = string
-  default     = "chaos-edge"
+variable "tags" {
+  description = "Common tags applied to all resources"
+  type        = map(string)
+  default = {
+    Project = "chaos-edge-devops"
+    Owner   = "ccarrylab"
+  }
 }
-
-variable "app_image_uri" {
-  description = "ECR URI for the chaos-edge Go application"
-  type        = string
-  default     = "chaos-edge-go:latest"  # Use generic name in repo
-}
-
