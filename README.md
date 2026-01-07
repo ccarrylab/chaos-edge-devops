@@ -55,3 +55,6 @@ Kubernetes Service (ClusterIP, chaos-service)
   │
   ▼
 Go Chaos App Pods (chaos-app Deployment)
+## LIVE DEMO  
+NLB: http://ade3956ce43bb495ba2f778bbac01145-214289985.us-east-1.elb.amazonaws.com  
+EKS: chaos-edge (ACTIVE)
