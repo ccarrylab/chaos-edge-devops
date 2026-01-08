@@ -31,7 +31,6 @@ This repository showcases **production-ready DevOps practices** through a comple
 # 1. Clone and setup
 git clone https://github.com/ccarrylab/chaos-edge-devops.git
 cd chaos-edge-devops
-make setup
 
 # 2. Deploy infrastructure
 make init
