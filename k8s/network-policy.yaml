@@ -1,52 +1,37 @@
-# Default deny all ingress traffic
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: default-deny-ingress
-  namespace: default
-spec:
-  podSelector: {}
-  policyTypes:
-  - Ingress
-
 ---
-# Allow ingress from NGINX ingress controller
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-from-nginx-ingress
-  namespace: default
+  name: chaos-app-netpol
+  namespace: chaos-edge
 spec:
   podSelector:
     matchLabels:
-      app: chaos-go
+      app: chaos-app
   policyTypes:
-  - Ingress
+    - Ingress
+    - Egress
   ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: nginx-ingress
-    ports:
-    - protocol: TCP
-      port: 8080
-
----
-# Allow DNS resolution
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-dns-egress
-  namespace: default
-spec:
-  podSelector: {}
-  policyTypes:
-  - Egress
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 80
+    - from:
+        - podSelector:
+            matchLabels:
+              app: chaos-app
   egress:
-  - to:
-    - namespaceSelector:
-        matchLabels:
-          name: kube-system
-    ports:
-    - protocol: UDP
-      port: 53
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app: chaos-app
