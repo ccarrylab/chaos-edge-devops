@@ -31,6 +31,7 @@ This repository showcases **production-ready DevOps practices** through a comple
 # 1. Clone and setup
 git clone https://github.com/ccarrylab/chaos-edge-devops.git
 cd chaos-edge-devops
+make setup
 
 # 2. Deploy infrastructure
 make init
@@ -73,11 +74,13 @@ make monitoring-install # Install Prometheus & Grafana
 
 ## 📬 Contact
 
-**Lights** - Senior DevOps Engineer
+**Cohen H. Carryl** - Senior DevOps Engineer
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin)](https://linkedin.com/in/yourprofile)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/cohen-h-carryl-3538b614/)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=flat&logo=github)](https://github.com/ccarrylab)
 
 ---
 
 **⭐ Star this repo if you find it helpful!**
+
+**Built with ❤️ by DevOps Engineers, for DevOps Engineers**
