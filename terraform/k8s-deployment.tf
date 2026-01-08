@@ -35,29 +35,29 @@ resource "kubernetes_deployment_v1" "chaos_app" {
         container {
           name  = "chaos-app"
           image = "public.ecr.aws/nginx/nginx:stable"
-          
+
           port {
-            container_port = 80  # Changed from 8080 to 80
+            container_port = 80 # Changed from 8080 to 80
           }
-          
+
           readiness_probe {
             http_get {
-              path = "/"  # Changed from /healthz to /
-              port = 80   # Changed from 8080 to 80
+              path = "/" # Changed from /healthz to /
+              port = 80  # Changed from 8080 to 80
             }
             initial_delay_seconds = 5
             period_seconds        = 10
           }
-          
+
           liveness_probe {
             http_get {
-              path = "/"  # Changed from /healthz to /
-              port = 80   # Changed from 8080 to 80
+              path = "/" # Changed from /healthz to /
+              port = 80  # Changed from 8080 to 80
             }
             initial_delay_seconds = 15
             period_seconds        = 20
           }
-          
+
           resources {
             limits = {
               cpu    = "500m"
@@ -93,7 +93,7 @@ resource "kubernetes_service" "chaos_service" {
     port {
       name        = "http"
       port        = 80
-      target_port = 80  # Changed from 8080 to 80
+      target_port = 80 # Changed from 8080 to 80
     }
     type = "ClusterIP"
   }
