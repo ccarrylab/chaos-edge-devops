@@ -1,76 +1,84 @@
-```markdown
-# Chaos Edge DevOps Platform 🚀
+# 🚀 Chaos Edge DevOps - Production-Ready EKS Infrastructure
 
-**Production Chaos Engineering Demo**  
-**EKS + NGINX NLB + Go Microservice + Terraform IaC (85+ resources)**
+[![Terraform](https://img.shields.io/badge/Terraform-1.5+-623CE4?logo=terraform&logoColor=white)](https://www.terraform.io/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-1.30-326CE5?logo=kubernetes&logoColor=white)](https://kubernetes.io/)
+[![AWS](https://img.shields.io/badge/AWS-EKS-FF9900?logo=amazonaws&logoColor=white)](https://aws.amazon.com/eks/)
+[![CI](https://github.com/ccarrylab/chaos-edge-devops/workflows/CI/badge.svg)](https://github.com/ccarrylab/chaos-edge-devops/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![EKS](https://img.shields.io/badge/AWS-EKS-blue?logo=amazonaws)](https://aws.amazon.com/eks/)
-[![Terraform](https://img.shields.io/badge/Terraform-85%2B_resources-orange?logo=terraform)](https://www.terraform.io/)
-[![Chaos Engineering](https://img.shields.io/badge/Chaos-Engineering-red)](https://principlesofchaos.org/)
+> **Enterprise-grade AWS EKS infrastructure with chaos engineering, observability, and GitOps best practices**
 
-## ✨ Live Demo Results (2026-01-07)
-```
-✅ **EKS Cluster**: chaos-edge (v1.30, 2x t3.medium nodes) - ACTIVE  
-✅ **NGINX NLB**: Live endpoint responding (Network Load Balancer)  
-✅ **Go App**: 3 replicas, /healthz endpoint healthy  
-✅ **Terraform**: 85+ resources (VPC/NAT/EKS/NGINX/K8s)  
-✅ **Chaos Tests**: Pod-kill, scale-to-zero, network-loss ✓
-```
+[📖 Documentation](docs/) | [🏗️ Architecture](docs/architecture/) | [🚀 Quick Start](#-quick-start)
 
-## 🚀 Quick Start (15 minutes → LIVE demo)
+---
 
+## ✨ Highlights
+
+This repository showcases **production-ready DevOps practices** through a complete AWS EKS deployment with advanced features.
+
+### 🎯 Key Features
+
+- **Infrastructure as Code**: Complete EKS cluster provisioning with Terraform
+- **Chaos Engineering**: Pre-configured Chaos Mesh experiments for resilience testing
+- **Observability Stack**: Prometheus + Grafana monitoring
+- **Security Best Practices**: RBAC, Network Policies, Pod Security Standards
+- **GitOps Ready**: GitHub Actions CI/CD pipelines
+- **Cost Optimized**: ~$200/month with optimization guide
+- **Production Ingress**: NGINX Ingress Controller with AWS Load Balancer
+
+## 🚀 Quick Start
 ```bash
-# Prerequisites: AWS CLI + kubectl + Docker Desktop + Terraform 1.5+
-make deploy              # 12min: EKS + VPC + NGINX NLB
-make chaos-demo          # Production chaos experiments  
-curl <NLB_ENDPOINT>/healthz  # "Chaos Edge LIVE"
-make destroy             # Clean teardown (2min)
+# 1. Clone and setup
+git clone https://github.com/ccarrylab/chaos-edge-devops.git
+cd chaos-edge-devops
+make setup
+
+# 2. Deploy infrastructure
+make init
+make apply  # Takes ~15 minutes
+
+# 3. Configure kubectl
+make kubeconfig
+
+# 4. Verify
+make k8s-status
 ```
 
-## 🏗️ Production Architecture
-```
-Internet
-   ↓
-NGINX NLB (AWS ALB/NLB)
-   ↓ Ingress Controller
-Kubernetes Service (chaos-service)
-   ↓
-Go Chaos App (3 replicas, port 8080/healthz)
-   ↓ Healthchecks + Circuit Breakers
-Amazon ECR (chaos-edge-go:latest)
-```
+## 💰 Cost Breakdown (~$216/month)
 
-## 🎪 Chaos Engineering Experiments
+| Component | Monthly Cost |
+|-----------|--------------|
+| EKS Control Plane | $73 |
+| EC2 (2x t3.medium) | $61 |
+| NAT Gateway | $33 |
+| Load Balancer | $23 |
+| EBS Volumes | $16 |
 
+[See cost optimization guide](docs/guides/cost-optimization.md) to reduce by 60%
+
+## 📖 Documentation
+
+- [Getting Started](docs/guides/getting-started.md)
+- [Architecture](docs/architecture/README.md)
+- [Troubleshooting](docs/guides/troubleshooting.md)
+- [Chaos Engineering](docs/tutorials/chaos-experiments.md)
+- [Monitoring Setup](docs/tutorials/monitoring-setup.md)
+
+## 🛠️ Commands
 ```bash
-make chaos-pod-kill      # 🐒 Chaos Monkey: Random pod termination + auto-recovery
-make chaos-scale-zero    # 📉 Scale to 0 → auto-recovery (HPA ready)
-make chaos-network-loss  # 🌐 Simulate network partition
-make chaos-resource-starve # 🧠 CPU/Memory pressure tests
+make help              # Show all commands
+make quick-start       # Complete deployment
+make chaos-demo        # Run chaos experiments
+make monitoring-install # Install Prometheus & Grafana
 ```
 
-## 📁 Repository Structure
+## 📬 Contact
 
-```
-chaos-edge-devops/
-├── terraform/               # IaC (85+ resources)
-│   ├── main.tf             # EKS + VPC + NGINX
-│   ├── provider.tf         # AWS/K8s/Helm providers
-│   └── outputs.tf          # eks_endpoint, cluster_status
-├── app/go-service/         # Production Go microservice
-│   ├── Dockerfile         # Multi-stage, healthchecks
-│   └── main.go            # /healthz + chaos endpoints
-├── k8s/                    # Kubernetes manifests
-│   ├── deployment.yaml    # 3 replicas, readiness probes
-│   ├── service.yaml       # ClusterIP → chaos-service
-│   ├── network-policy.yaml # Zero-trust networking
-│   └── rbac.yaml          # Least-privilege roles
-├── Makefile                # 🔥 One-command automation
-├── chaos-demo.sh           # Production chaos patterns
-└── fix-chaos-edge.sh       # Troubleshooting automation
-```
+**Lights** - Senior DevOps Engineer
 
-## 💼 Technical Skills Demonstrated
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin)](https://linkedin.com/in/yourprofile)
+[![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=flat&logo=github)](https://github.com/ccarrylab)
 
-| **Category** | **Technologies** | **Experience Level** |
-|--------------|------------------|---------------------
+---
+
+**⭐ Star this repo if you find it helpful!**
