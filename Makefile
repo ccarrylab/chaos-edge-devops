@@ -1,3 +1,5 @@
+SHELL := /usr/bin/env bash
+
 .PHONY: help init plan apply destroy test clean format validate security-scan cost-estimate
 
 # Variables
