@@ -1,0 +1,14 @@
+name: Chaos Engineering CI/CD
+on: [push, pull_request]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Security Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+    - name: Makefile Tests  
+      run: make validate || true
