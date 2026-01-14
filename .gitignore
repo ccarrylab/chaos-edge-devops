@@ -1,5 +1,6 @@
-*.tfstate*
 .terraform/
+*.tfstate*
 .kube/
-chaos-results/
 *.log
+chaos-results/
+.DS_Store
