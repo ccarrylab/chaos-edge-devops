@@ -227,3 +227,14 @@ quick-start: setup init apply kubeconfig k8s-status ## Complete quick start depl
 	@echo ''
 
 .DEFAULT_GOAL := help
+# Production Commands
+observability-demo:
+	@echo "📊 Deploying Chaos Dashboards..."
+	@helm upgrade --install monitoring grafana/grafana -n monitoring --create-namespace
+	@echo "✅ Grafana: kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80"
+
+validate:
+	@make security-scan terraform-validate
+
+security-scan:
+	@docker run --rm -v "$(PWD)":/work aquasec/trivy fs /work
