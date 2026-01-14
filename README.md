@@ -144,3 +144,4 @@ make cost-estimate     # Show monthly costs
 **⭐ Star if you find this helpful!**
 
 *Built with ❤️ for the DevOps community*
+![CI/CD](https://github.com/ccarrylab/chaos-edge-devops/actions/workflows/chaos-cd.yml/badge.svg)
