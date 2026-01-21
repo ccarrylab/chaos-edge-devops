@@ -1,10 +1,24 @@
 ########################
-# Namespace
+# AUTO NAMESPACE with RETRY
 ########################
-resource "kubernetes_namespace" "chaos" {
-  metadata {
-    name = "chaos-edge"
+resource "null_resource" "create_namespace" {
+  provisioner "local-exec" {
+    command = <<EOT
+      for i in {1..5}; do
+        echo "Attempt $$i: Creating namespace chaos-edge..."
+        if kubectl create namespace chaos-edge --dry-run=client -o yaml | kubectl apply -f -; then
+          echo "✅ Namespace created!"
+          kubectl wait --for=condition=Ready namespace/chaos-edge --timeout=30s && echo "✅ Namespace ready!" && exit 0
+        fi
+        echo "Waiting 5s before retry..."
+        sleep 5
+      done
+      echo "❌ Failed to create namespace after 5 attempts"
+      exit 1
+    EOT
   }
+
+  depends_on = [helm_release.nginx_ingress]
 }
 
 ########################
@@ -13,7 +27,7 @@ resource "kubernetes_namespace" "chaos" {
 resource "kubernetes_deployment_v1" "chaos_app" {
   metadata {
     name      = "chaos-app"
-    namespace = kubernetes_namespace.chaos.metadata[0].name
+    namespace = "chaos-edge"
     labels = {
       app = "chaos-app"
     }
@@ -37,13 +51,13 @@ resource "kubernetes_deployment_v1" "chaos_app" {
           image = "public.ecr.aws/nginx/nginx:stable"
 
           port {
-            container_port = 80 # Changed from 8080 to 80
+            container_port = 80
           }
 
           readiness_probe {
             http_get {
-              path = "/" # Changed from /healthz to /
-              port = 80  # Changed from 8080 to 80
+              path = "/"
+              port = 80
             }
             initial_delay_seconds = 5
             period_seconds        = 10
@@ -51,8 +65,8 @@ resource "kubernetes_deployment_v1" "chaos_app" {
 
           liveness_probe {
             http_get {
-              path = "/" # Changed from /healthz to /
-              port = 80  # Changed from 8080 to 80
+              path = "/"
+              port = 80
             }
             initial_delay_seconds = 15
             period_seconds        = 20
@@ -72,7 +86,7 @@ resource "kubernetes_deployment_v1" "chaos_app" {
       }
     }
   }
-  depends_on = [kubernetes_namespace.chaos]
+  depends_on = [null_resource.create_namespace]
 }
 
 ########################
@@ -81,7 +95,7 @@ resource "kubernetes_deployment_v1" "chaos_app" {
 resource "kubernetes_service" "chaos_service" {
   metadata {
     name      = "chaos-service"
-    namespace = kubernetes_namespace.chaos.metadata[0].name
+    namespace = "chaos-edge"
     labels = {
       app = "chaos-app"
     }
@@ -93,7 +107,7 @@ resource "kubernetes_service" "chaos_service" {
     port {
       name        = "http"
       port        = 80
-      target_port = 80 # Changed from 8080 to 80
+      target_port = 80
     }
     type = "ClusterIP"
   }
@@ -106,7 +120,7 @@ resource "kubernetes_service" "chaos_service" {
 resource "kubernetes_ingress_v1" "chaos_ingress" {
   metadata {
     name      = "chaos-ingress"
-    namespace = kubernetes_namespace.chaos.metadata[0].name
+    namespace = "chaos-edge"
     annotations = {
       "kubernetes.io/ingress.class" = "nginx"
     }
@@ -131,6 +145,6 @@ resource "kubernetes_ingress_v1" "chaos_ingress" {
   }
   depends_on = [
     kubernetes_service.chaos_service,
-    helm_release.nginx_ingress
+    null_resource.create_namespace
   ]
 }
