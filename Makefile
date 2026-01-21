@@ -43,3 +43,10 @@ security-scan:
 
 observability-demo:
 	kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80
+monitor-up:
+	kubectl create ns monitoring || true
+	helm install monitoring prometheus-community/kube-prometheus-stack -n monitoring
+monitor:
+	kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80 &
+	kubectl port-forward -n monitoring svc/prometheus-operated 9090:9090 &
+	@sleep 2 && open http://localhost:3000
