@@ -38,10 +38,23 @@
 # 1. Clone and setup
 git clone https://github.com/ccarrylab/chaos-edge-devops.git
 cd chaos-edge-devops
+
+cd terraform
+
+terraform init
+terraform plan
+
+terraform apply
+
+cd ..
+
 make setup
 
 # 2. Deploy (15 minutes)
-make quick-start
+make quick-start       # Complete deployment
+make chaos-demo        # Run chaos experiments
+make monitoring-install # Install Grafana
+make cost-estimate     # Show monthly costs
 
 # 3. Done! 🎉
 ```
