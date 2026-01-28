@@ -48,7 +48,6 @@ terraform apply
 
 cd ..
 
-make setup
 
 # 2. Deploy (15 minutes)
 make quick-start       # Complete deployment
